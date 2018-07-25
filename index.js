@@ -36,16 +36,6 @@ const createImplementationTask = async issueKey => {
       summary: story.fields.summary,
       description: `Implementation task for ${issueKey}`,
       fixVersions: story.fields.fixVersions.map(fixVersion => ({id: fixVersion.id})),
-      issuelinks: [
-        {
-          type: { 
-            id: 10300 // IS CAUSED BY
-          },
-          inwardIssue: {
-            id: story.id
-          }
-        }
-      ],
       [EPIC_LINK]: story.fields[EPIC_LINK],
       [STORY_POINTS]: story.fields[STORY_POINTS],
     }
@@ -54,6 +44,21 @@ const createImplementationTask = async issueKey => {
   const task = await request('issue', {
     method: 'POST',
     body: createBody
+  });
+
+  await request('issueLink', {
+    method: 'POST',
+    body: {
+      type: {
+        id: 10300 // CAUSES / IS CAUSED BY
+      },
+      inwardIssue: {
+        id: story.id
+      },
+      outwardIssue: {
+        id: task.id
+      }
+    }
   });
 
   return task.key;
