@@ -19,8 +19,12 @@ const request = requestPromise.defaults({
 
 const createImplementationTaskForStory = async issueKey => {
   const story = await request(`issue/${issueKey}`);
-  if(story.fields.issuetype.name !== 'Story') {
-    throw new Error(`Issue ${issueKey} is a ${story.fields.issueType.name}, expected it to be a Story.`);
+  switch(story.fields.issuetype.name) {
+    case 'Story':
+    case 'Bug':
+      break;
+    default:
+      throw new Error(`Issue ${issueKey} is a ${story.fields.issueType.name}, expected it to be a Story or a Bug.`);
   }
 
   const createTaskRequestBody = {
